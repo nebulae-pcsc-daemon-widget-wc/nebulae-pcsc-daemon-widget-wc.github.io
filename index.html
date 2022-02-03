@@ -1,9 +1,152 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <!-- head definitions go here -->
-    </head>
-    <body>
-        hi!
-    </body>
+<html lang="en">
+
+<head>
+  <title>PCSC Daemon Widget</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    /* Style the header */
+    header {
+      background-color: #666;
+      padding: 30px;
+      text-align: center;
+      font-size: 35px;
+      color: white;
+    }
+
+    /* Create two columns/boxes that floats next to each other */
+    actions {
+      float: left;
+      width: 15%;
+      height: 600px;
+      /* only for demonstration, should be removed */
+      background: #ccc;
+      padding: 20px;
+    }
+
+    /* Style the list inside the menu */
+    actions ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    events {
+      float: left;
+      padding: 20px;
+      width: 85%;
+      background-color: #f1f1f1;
+      height: 600px;
+      /* only for demonstration, should be removed */
+    }
+
+    /* Clear floats after the columns */
+    section::after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+
+    /* Style the footer */
+    footer {
+      background-color: #777;
+      padding: 10px;
+      text-align: center;
+      color: white;
+    }
+
+    /* Responsive layout - makes the two columns/boxes stack on top of each other instead of next to each other, on small screens */
+    @media (max-width: 600px) {
+
+      actions,
+      events {
+        width: 100%;
+        height: auto;
+      }
+    }
+  </style>
+
+  <script>
+
+    let widget;
+
+    function getWidget() {
+      if (widget) return widget;
+      widget = document.querySelector("pcsc-daemon-widget-wc");
+      widget.addEventListener('pcsc-widget-event', (e) => {
+        // handle event
+        document.getElementById("logText").value = `${document.getElementById("logText").value}\n \n ${new Date().toLocaleString()}: ${JSON.stringify(e.detail)}`
+
+        console.log("EVENTO ===> ", e.detail) // 42
+      });
+      return widget;
+    }
+
+
+    function startDeamon() {
+      getWidget().startPcscDaemon();
+    }
+
+    function stopDeamon() {
+      getWidget().stopPcscDaemon();
+    }
+
+    function lockSmartCard() {
+      getWidget().lockSmartCard();
+    }
+
+    function resetReader() {
+      getWidget().resetReader();
+    }
+
+    function processSmartCard() {
+      getWidget().processSmartCard();
+    }
+
+  </script>
+</head>
+
+<body>
+  <header>
+    <pcsc-daemon-widget-wc pcscDaemonServiceUrl="https://192.168.188.207:1215/pcsc-daemon" daemonEnabled=true,
+      samReaderEnabled=false  contactLessReaderEnabled=true,
+      webServiceUrl='http://localhost:3002' webServiceApiType='rest'
+      authorizationToken='Y2FqZXJvLnBvc0BuZWJ1bGFlLmNvbS5jbzp1bm8uMi50cmVz' restUsername='leonardo.gutierrez'
+      restPassword='uno.2.tres' pointOfSaleId="NebulaE" terminalKey='5564154'></pcsc-daemon-widget-wc>
+  </header>
+
+  <section>
+    <actions>
+      <ul>
+        <li><a href="#" onclick="startDeamon()">START</a></li>
+        <li><a href="#" onclick="stopDeamon()">STOP</a></li>
+        <li><a href="#" onclick="resetReader()">RESET</a></li>
+        <li><a href="#" onclick="processSmartCard()">PROCESS CARD</a></li>
+
+      </ul>
+    </actions>
+
+    <events>
+      <textarea id="logText" style="width: 100%" id="events" rows="30">
+
+        </textarea>
+    </events>
+  </section>
+
+  <footer>
+    <p>
+      PCSC Daemon Widget WebComponent Development Environment - Nebula
+      Engineering SAS
+    </p>
+  </footer>
+</body>
+
 </html>
