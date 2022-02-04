@@ -5,7 +5,6 @@
   <title>PCSC Daemon Widget</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://fleet.nebulae.com.co/emi/assets/widget/direflowBundle.js"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -82,6 +81,8 @@
     function getWidget() {
       if (widget) return widget;
       widget = document.querySelector("pcsc-daemon-widget-wc");
+      widget.setRestUsername(localStorage.getItem("restUsername"));
+      widget.setRestPassword(localStorage.getItem("restPassword"));
       widget.addEventListener('pcsc-widget-event', (e) => {
         // handle event
         document.getElementById("logText").value = `${document.getElementById("logText").value}\n \n ${new Date().toLocaleString()}: ${JSON.stringify(e.detail)}`
@@ -112,16 +113,24 @@
       getWidget().processSmartCard();
     }
 
+    function refreshInfo() {
+      getWidget().setRestPassword(document.getElementById("password").value);
+      getWidget().setRestUsername(document.getElementById("username").value);
+      localStorage.setItem("restUsername", document.getElementById("username").value);
+      localStorage.setItem("restPassword", document.getElementById("password").value);
+
+    }
+
   </script>
 </head>
 
 <body>
   <header>
-    <pcsc-daemon-widget-wc pcscDaemonServiceUrl="https://192.168.188.207:1215/pcsc-daemon" daemonEnabled=true,
+    <pcsc-daemon-widget-wc id="pcscDeamonItem" pcscDaemonServiceUrl="https://192.168.188.207:1215/pcsc-daemon" daemonEnabled=true,
       samReaderEnabled=false  contactLessReaderEnabled=true,
       webServiceUrl='https://fleet.nebulae.com.co' webServiceApiType='rest'
-      authorizationToken='Y2FqZXJvLnBvc0BuZWJ1bGFlLmNvbS5jbzp1bm8uMi50cmVz' restUsername='leonardo.gutierrez'
-      restPassword='uno.2.tres' pointOfSaleId="NebulaE" terminalKey='5564154D'></pcsc-daemon-widget-wc>
+      authorizationToken='Y2FqZXJvLnBvc0BuZWJ1bGFlLmNvbS5jbzp1bm8uMi50cmVz'
+      pointOfSaleId="NebulaE" terminalKey='5564154d'></pcsc-daemon-widget-wc>
   </header>
 
   <section>
@@ -130,8 +139,10 @@
         <li><a href="#" onclick="startDeamon()">START</a></li>
         <li><a href="#" onclick="stopDeamon()">STOP</a></li>
         <li><a href="#" onclick="resetReader()">RESET</a></li>
-        <li><a href="#" onclick="processSmartCard()">PROCESS CARD</a></li>
-
+        <li style="margin-bottom: 20px;"><a href="#" onclick="processSmartCard()">PROCESS CARD</a></li>
+        <li> <input type="text" id="username" placeholder="Username"></li>
+        <li> <input style="margin-bottom: 10px;" type="password" id="password" placeholder="Password"></li>
+        <button onclick="refreshInfo()">Refresh Info</button>
       </ul>
     </actions>
 
