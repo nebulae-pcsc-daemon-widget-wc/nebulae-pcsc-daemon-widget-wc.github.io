@@ -62,27 +62,6 @@
       text-align: center;
       color: white;
     }
-    
-    div[role='tooltip']{
-      margin-top: 10px;
-    }
-
-    div[role='tooltip']>div {
-      color: #fff;
-      padding: 4px 8px;
-      font-size: 1rem;
-      max-width: 300px;
-      word-wrap: break-word;
-      font-family: Muli, Roboto, "Helvetica", Arial, sans-serif;
-      font-weight: 500;
-      line-height: 1.4em;
-      border-radius: 4px;
-      background-color: rgba(97, 97, 97, 0.9);
-    }
-
-    div[role='tooltip'] > div p{
-      margin: 0;
-    }
 
     /* Responsive layout - makes the two columns/boxes stack on top of each other instead of next to each other, on small screens */
     @media (max-width: 600px) {
@@ -95,6 +74,7 @@
     }
   </style>
   <script src="https://fleet.nebulae.com.co/emi/assets/widget/pcsc-widget.js"></script>
+
   <script>
 
     let widget;
@@ -104,7 +84,9 @@
       widget = document.querySelector("pcsc-daemon-widget-wc");
       widget.setRestUsername(localStorage.getItem("restUsername"));
       widget.setRestPassword(localStorage.getItem("restPassword"));
-      widget.setWebServiceUrl(localStorage.getItem("webServiceUrl"))
+      widget.setWebServiceUrl(localStorage.getItem("webServiceUrl"));
+      widget.setAuthorizationType(localStorage.getItem("authType"));
+      widget.setAuthorizationToken(localStorage.getItem("authToken"));
       widget.addEventListener('pcsc-widget-event', (e) => {
         // handle event
         document.getElementById("logText").value = `${document.getElementById("logText").value}\n \n ${new Date().toLocaleString()}: ${JSON.stringify(e.detail)}`
@@ -139,9 +121,14 @@
       getWidget().setRestPassword(document.getElementById("password").value);
       getWidget().setRestUsername(document.getElementById("username").value);
       getWidget().setWebServiceUrl(document.getElementById("webServiceUrl").value);
+      getWidget().setAuthorizationType(document.getElementById("authType").value);
+      getWidget().setAuthorizationToken(document.getElementById("authToken").value);
+      console.log("SELECTED ===> ", document.getElementById("authType").value)
       localStorage.setItem("restUsername", document.getElementById("username").value);
       localStorage.setItem("restPassword", document.getElementById("password").value);
       localStorage.setItem("webServiceUrl", document.getElementById("webServiceUrl").value);
+      localStorage.setItem("authToken", document.getElementById("authToken").value);
+      localStorage.setItem("authType", document.getElementById("authType").value);
 
     }
 
@@ -150,9 +137,9 @@
 
 <body>
   <header>
-    <pcsc-daemon-widget-wc id="pcscDeamonItem" pcscDaemonServiceUrl="https://localhost:1215/pcsc-daemon"
+    <pcsc-daemon-widget-wc id="pcscDeamonItem" pcscDaemonServiceUrl="https://192.168.188.207:1215/pcsc-daemon"
       daemonEnabled=true, samReaderEnabled=false contactLessReaderEnabled=true webServiceApiType='rest'
-      authorizationToken='Y2FqZXJvLnBvc0BuZWJ1bGFlLmNvbS5jbzp1bm8uMi50cmVz' pointOfSaleId="NebulaE"
+      pointOfSaleId="NebulaE"
       terminalKey='5564154d'></pcsc-daemon-widget-wc>
   </header>
 
@@ -164,12 +151,23 @@
         <li><a href="#" onclick="resetReader()">RESET</a></li>
         <li style="margin-bottom: 20px;"><a href="#" onclick="processSmartCard()">PROCESS CARD</a></li>
         <li> <input type="text" id="webServiceUrl" placeholder="Web Service URL"></li>
+        <li>
+          <label for="authType">Auth Type:</label>
+
+          <select name="authType" id="authType">
+            <option value="BASIC">Basic Auth</option>
+            <option value="TOKEN">Token</option>
+          </select>
+        </li>
+        <li> <input type="text" id="authToken" placeholder="Auth Token"></li>
         <li> <input type="text" id="username" placeholder="Username"></li>
         <li> <input type="password" id="password" placeholder="Password"></li>
         <script type="text/javascript">
           document.getElementById("password").value = localStorage.getItem("restPassword");
           document.getElementById("username").value = localStorage.getItem("restUsername");
           document.getElementById("webServiceUrl").value = localStorage.getItem("webServiceUrl");
+          document.getElementById("authType").value = localStorage.getItem("authType");
+          document.getElementById("authToken").value = localStorage.getItem("authToken");
         </script>
         <button onclick="refreshInfo()">Refresh Info</button>
       </ul>
@@ -185,7 +183,7 @@
   <footer>
     <p>
       PCSC Daemon Widget WebComponent Development Environment - Nebula
-      Engineering SAS.
+      Engineering SAS
     </p>
   </footer>
 </body>
